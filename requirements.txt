@@ -1,7 +1,7 @@
 setuptools>=65.5.1
 wheel
 flask==2.2.3
-Werkzeug==2.0.3
+Werkzeug==2.2.2
 
 
 ipykernel==6.23.1
