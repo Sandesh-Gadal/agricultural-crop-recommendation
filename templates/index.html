@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><title>Crop Predictor</title></head>
+<body>
+  <h2>Enter Soil and Weather Conditions</h2>
+  <form action="/predict" method="post">
+    Nitrogen (N): <input type="number" name="N" required><br>
+    Phosphorus (P): <input type="number" name="P" required><br>
+    Potassium (K): <input type="number" name="K" required><br>
+    Temperature (°C): <input type="number" step="any" name="temperature" required><br>
+    Humidity (%): <input type="number" step="any" name="humidity" required><br>
+    pH: <input type="number" step="any" name="ph" required><br>
+    Rainfall (mm): <input type="number" step="any" name="rainfall" required><br><br>
+    <input type="submit" value="Predict Crop">
+  </form>
+</body>
+</html>
