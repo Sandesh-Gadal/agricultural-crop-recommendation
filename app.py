@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 import numpy as np
 import pandas as pd
 import pickle
@@ -12,13 +12,23 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template('index.html')  # Create this file in templates folder
+    return render_template('index.html')  # Make sure this exists in 'templates/'
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    if request.method == 'POST':
-        try:
-            # Get form values
+    try:
+        # If the request is JSON (API call)
+        if request.is_json:
+            data = request.get_json()
+            N = float(data['N'])
+            P = float(data['P'])
+            K = float(data['K'])
+            temperature = float(data['temperature'])
+            humidity = float(data['humidity'])
+            ph = float(data['ph'])
+            rainfall = float(data['rainfall'])
+        else:
+            # Request is from HTML form
             N = float(request.form['N'])
             P = float(request.form['P'])
             K = float(request.form['K'])
@@ -27,22 +37,25 @@ def predict():
             ph = float(request.form['ph'])
             rainfall = float(request.form['rainfall'])
 
-            # Convert into DataFrame for model
-            user_input = pd.DataFrame([[N, P, K, temperature, humidity, ph, rainfall]],
-                                      columns=['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall'])
+        # Convert input to DataFrame
+        user_input = pd.DataFrame([[N, P, K, temperature, humidity, ph, rainfall]],
+                                  columns=['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall'])
 
-            # Make prediction
-            prediction = model.predict(user_input)[0]
+        # Make prediction
+        prediction = model.predict(user_input)[0]
 
+        if request.is_json:
+            return jsonify({"prediction": prediction})
+        else:
             return render_template('result.html', prediction=prediction)
-        except Exception as e:
+
+    except Exception as e:
+        if request.is_json:
+            return jsonify({"error": str(e)}), 400
+        else:
             return f"Error occurred: {e}"
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
-
-
+# Production-compatible host and port for Render
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # Render sets PORT env var
-    app.run(host='0.0.0.0', port=port, debug=False)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
